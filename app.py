@@ -1,12 +1,11 @@
 import streamlit as st
 import datetime
 import json
-from google import genai
-from google.genai import types
+import google.generativeai as genai
 
 st.set_page_config(page_title="Universal Course Generator", layout="wide", page_icon="🎓")
 
-st.title("🎓 Universal Course & Exam Generator (Free Tier)")
+st.title("🎓 Universal Course & Exam Generator")
 st.write("Generate a custom, structured curriculum for **any subject** with assignments, open-response prompts, and comprehensive tests based on your deadline.")
 
 # Sidebar Configuration
@@ -61,19 +60,23 @@ if st.button("🚀 Generate Complete Course", type="primary"):
     else:
         with st.spinner("Building custom curriculum, open-response prompts, and comprehensive assessments..."):
             try:
-                client = genai.Client(api_key=api_key)
-                response = client.models.generate_content(
-                    model='gemini-1.5-flash',  # Updated model name here
-                    contents=build_course_prompt(course_name, num_modules, days_remaining),
-                    config=types.GenerateContentConfig(
-                        response_mime_type="application/json"
-                    )
+                # Configure the Gemini client
+                genai.configure(api_key=api_key)
+                
+                # Initialize model
+                model = genai.GenerativeModel(
+                    model_name="gemini-1.5-flash",
+                    generation_config={"response_mime_type": "application/json"}
                 )
+                
+                response = model.generate_content(build_course_prompt(course_name, num_modules, days_remaining))
+                
                 course_data = json.loads(response.text)
                 st.session_state['course_data'] = course_data
                 st.success("Course generated successfully!")
             except Exception as e:
                 st.error(f"Error generating course: {str(e)}")
+
 # Display Generated Course
 if 'course_data' in st.session_state:
     data = st.session_state['course_data']
