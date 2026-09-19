@@ -57,6 +57,9 @@ def build_course_prompt(topic, modules, days):
 if st.button("🚀 Generate Complete Course", type="primary"):
     if not course_name:
         st.error("Please enter a course topic first!")
+   if st.button("🚀 Generate Complete Course", type="primary"):
+    if not course_name:
+        st.error("Please enter a course topic first!")
     elif not api_key:
         st.warning("Please enter your free Google Gemini API Key in the sidebar.")
     else:
@@ -64,22 +67,17 @@ if st.button("🚀 Generate Complete Course", type="primary"):
             try:
                 client = genai.Client(api_key=api_key)
                 
-                # Dynamically fetch active flash models available on your API key
-                available_models = [
-                    m.name for m in client.models.list() 
-                    if "flash" in m.name.lower() and "preview" not in m.name.lower()
-                ]
+                # Fetch all text generation models supported by your key
+                all_models = [m.name.replace("models/", "") for m in client.models.list()]
                 
-                # Default fallback if list is restricted
-                if not available_models:
-                    available_models = ['gemini-2.5-flash']
-
-                selected_model = available_models[0].replace("models/", "")
+                # Filter for flash models or grab the first available model
+                flash_models = [m for m in all_models if "flash" in m.lower()]
+                selected_model = flash_models[0] if flash_models else all_models[0]
                 
                 course_data = None
                 last_error = None
                 
-                # Retry loop handling server spikes
+                # Try generation with retry logic
                 for attempt in range(3):
                     try:
                         response = client.models.generate_content(
@@ -89,6 +87,20 @@ if st.button("🚀 Generate Complete Course", type="primary"):
                                 response_mime_type="application/json"
                             )
                         )
+                        course_data = json.loads(response.text)
+                        break
+                    except Exception as e:
+                        last_error = e
+                        time.sleep(2)
+                
+                if course_data:
+                    st.session_state['course_data'] = course_data
+                    st.success(f"Course generated successfully using `{selected_model}`!")
+                else:
+                    st.error(f"Error generating course: {str(last_error)}")
+
+            except Exception as e:
+                st.error(f"API Connection Error: {str(e)}")
                         course_data = json.loads(response.text)
                         break
                     except Exception as e:
