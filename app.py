@@ -57,9 +57,6 @@ def build_course_prompt(topic, modules, days):
 if st.button("🚀 Generate Complete Course", type="primary"):
     if not course_name:
         st.error("Please enter a course topic first!")
-   if st.button("🚀 Generate Complete Course", type="primary"):
-    if not course_name:
-        st.error("Please enter a course topic first!")
     elif not api_key:
         st.warning("Please enter your free Google Gemini API Key in the sidebar.")
     else:
@@ -67,7 +64,7 @@ if st.button("🚀 Generate Complete Course", type="primary"):
             try:
                 client = genai.Client(api_key=api_key)
                 
-                # Fetch all text generation models supported by your key
+                # Fetch all text generation models supported by your key dynamically
                 all_models = [m.name.replace("models/", "") for m in client.models.list()]
                 
                 # Filter for flash models or grab the first available model
@@ -98,20 +95,6 @@ if st.button("🚀 Generate Complete Course", type="primary"):
                     st.success(f"Course generated successfully using `{selected_model}`!")
                 else:
                     st.error(f"Error generating course: {str(last_error)}")
-
-            except Exception as e:
-                st.error(f"API Connection Error: {str(e)}")
-                        course_data = json.loads(response.text)
-                        break
-                    except Exception as e:
-                        last_error = e
-                        time.sleep(2)
-                
-                if course_data:
-                    st.session_state['course_data'] = course_data
-                    st.success(f"Course generated successfully using `{selected_model}`!")
-                else:
-                    st.error(f"Error generating course: {str(last_error)}. Please try clicking Generate again.")
 
             except Exception as e:
                 st.error(f"API Connection Error: {str(e)}")
@@ -163,3 +146,4 @@ if 'course_data' in st.session_state:
                 st.text_area(f"Write your extended solution/essay for Question {eq_idx}", key=f"exam_ans_{idx}_{eq_idx}")
                 with st.expander(f"View Grading Rubric / Model Solution for Q{eq_idx}"):
                     st.write(eq.get('rubric', ''))
+                    
