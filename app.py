@@ -63,7 +63,7 @@ if st.button("🚀 Generate Complete Course", type="primary"):
             try:
                 client = genai.Client(api_key=api_key)
                 response = client.models.generate_content(
-                    model='gemini-2.5-flash',
+                    model='gemini-1.5-flash',  # Updated model name here
                     contents=build_course_prompt(course_name, num_modules, days_remaining),
                     config=types.GenerateContentConfig(
                         response_mime_type="application/json"
@@ -74,7 +74,6 @@ if st.button("🚀 Generate Complete Course", type="primary"):
                 st.success("Course generated successfully!")
             except Exception as e:
                 st.error(f"Error generating course: {str(e)}")
-
 # Display Generated Course
 if 'course_data' in st.session_state:
     data = st.session_state['course_data']
