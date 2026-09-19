@@ -1,6 +1,7 @@
 import streamlit as st
 import datetime
 import json
+import time
 from google import genai
 from google.genai import types
 
@@ -53,8 +54,6 @@ def build_course_prompt(topic, modules, days):
     }}
     """
 
-import time
-
 if st.button("🚀 Generate Complete Course", type="primary"):
     if not course_name:
         st.error("Please enter a course topic first!")
@@ -63,15 +62,12 @@ if st.button("🚀 Generate Complete Course", type="primary"):
     else:
         with st.spinner("Building custom curriculum... (Handling traffic load)"):
             client = genai.Client(api_key=api_key)
-            
-            # List of models to try in order of preference
-            candidate_models = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-2.5-flash']
+            candidate_models = ['gemini-2.5-flash', 'gemini-2.0-flash']
             
             course_data = None
             last_error = None
             
             for model_name in candidate_models:
-                # Attempt up to 3 retries per model if overloaded
                 for attempt in range(3):
                     try:
                         response = client.models.generate_content(
@@ -82,28 +78,22 @@ if st.button("🚀 Generate Complete Course", type="primary"):
                             )
                         )
                         course_data = json.loads(response.text)
-                        break  # Success, exit retry loop
+                        break
                     except Exception as e:
                         last_error = e
                         if "503" in str(e) or "high demand" in str(e).lower():
-                            time.sleep(2)  # Pause before retrying on high demand
+                            time.sleep(2)
                         else:
-                            break  # If it's a non-traffic error, skip to next model
+                            break
                             
                 if course_data:
-                    break  # Success, exit model list loop
+                    break
             
             if course_data:
                 st.session_state['course_data'] = course_data
                 st.success("Course generated successfully!")
             else:
                 st.error(f"Error generating course: {str(last_error)}. Please wait a moment and click Generate again.")
-                
-                course_data = json.loads(response.text)
-                st.session_state['course_data'] = course_data
-                st.success("Course generated successfully!")
-            except Exception as e:
-                st.error(f"Error generating course: {str(e)}")
 
 # Display Generated Course
 if 'course_data' in st.session_state:
