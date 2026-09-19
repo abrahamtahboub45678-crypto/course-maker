@@ -60,40 +60,32 @@ if st.button("🚀 Generate Complete Course", type="primary"):
     elif not api_key:
         st.warning("Please enter your free Google Gemini API Key in the sidebar.")
     else:
-        with st.spinner("Building custom curriculum... (Handling traffic load)"):
+        with st.spinner("Building custom curriculum..."):
             client = genai.Client(api_key=api_key)
-            candidate_models = ['gemini-2.5-flash', 'gemini-2.0-flash']
-            
             course_data = None
             last_error = None
             
-            for model_name in candidate_models:
-                for attempt in range(3):
-                    try:
-                        response = client.models.generate_content(
-                            model=model_name,
-                            contents=build_course_prompt(course_name, num_modules, days_remaining),
-                            config=types.GenerateContentConfig(
-                                response_mime_type="application/json"
-                            )
+            # Retry loop strictly using the free-tier model
+            for attempt in range(3):
+                try:
+                    response = client.models.generate_content(
+                        model='gemini-2.5-flash',
+                        contents=build_course_prompt(course_name, num_modules, days_remaining),
+                        config=types.GenerateContentConfig(
+                            response_mime_type="application/json"
                         )
-                        course_data = json.loads(response.text)
-                        break
-                    except Exception as e:
-                        last_error = e
-                        if "503" in str(e) or "high demand" in str(e).lower():
-                            time.sleep(2)
-                        else:
-                            break
-                            
-                if course_data:
+                    )
+                    course_data = json.loads(response.text)
                     break
+                except Exception as e:
+                    last_error = e
+                    time.sleep(2)  # Pause and retry if free-tier traffic spikes
             
             if course_data:
                 st.session_state['course_data'] = course_data
                 st.success("Course generated successfully!")
             else:
-                st.error(f"Error generating course: {str(last_error)}. Please wait a moment and click Generate again.")
+                st.error(f"Error generating course: {str(last_error)}. Please try clicking Generate again.")
 
 # Display Generated Course
 if 'course_data' in st.session_state:
