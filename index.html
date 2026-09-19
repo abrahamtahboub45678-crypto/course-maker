@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>IB Math HL: Chapter 1 Mastery App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+
+  <!-- Header -->
+  <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-indigo-400">📐 IB HL Ch 1 Math Master</h1>
+      <div id="score-display" class="bg-indigo-900/60 border border-indigo-500/30 px-4 py-1.5 rounded-full text-sm font-semibold">
+        Progress Score: <span id="user-score" class="text-indigo-300">0</span> pts
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-6xl mx-auto flex-1 w-full flex flex-col md:flex-row gap-6 p-6">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="w-full md:w-64 bg-slate-800/60 border border-slate-700 rounded-xl p-4 flex flex-col gap-2 shrink-0">
+      <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Select Section</h2>
+      <button onclick="loadTopic('1A')" class="nav-btn bg-indigo-600 text-white font-medium p-3 rounded-lg text-left transition hover:bg-indigo-500" id="btn-1A">1A: Cartesian Plane</button>
+      <button onclick="loadTopic('1B')" class="nav-btn bg-slate-700 text-slate-200 font-medium p-3 rounded-lg text-left transition hover:bg-indigo-600" id="btn-1B">1B: Graphing Lines</button>
+      <button onclick="loadTopic('1C')" class="nav-btn bg-slate-700 text-slate-200 font-medium p-3 rounded-lg text-left transition hover:bg-indigo-600" id="btn-1C">1C: Voronoi & Bisectors</button>
+      <button onclick="loadTopic('1D')" class="nav-btn bg-slate-700 text-slate-200 font-medium p-3 rounded-lg text-left transition hover:bg-indigo-600" id="btn-1D">1D: Systems of Equations</button>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 bg-slate-800/40 border border-slate-700 rounded-xl p-6 flex flex-col gap-6">
+      
+      <!-- Module Header -->
+      <div>
+        <span id="module-badge" class="text-xs font-semibold px-2.5 py-1 bg-indigo-900/80 text-indigo-300 border border-indigo-600/40 rounded">Section 1A</span>
+        <h2 id="module-title" class="text-2xl font-bold mt-2">Lines in the Cartesian Plane</h2>
+      </div>
+
+      <!-- Mode Selector Tabs -->
+      <div class="flex border-b border-slate-700 gap-4 text-sm font-medium">
+        <button onclick="switchTab('lesson')" id="tab-lesson" class="pb-2 border-b-2 border-indigo-500 text-indigo-400">📖 Lesson</button>
+        <button onclick="switchTab('assignment')" id="tab-assignment" class="pb-2 text-slate-400 hover:text-slate-200">📝 Assignment</button>
+        <button onclick="switchTab('project')" id="tab-project" class="pb-2 text-slate-400 hover:text-slate-200">🚀 Real-World Project</button>
+        <button onclick="switchTab('test')" id="tab-test" class="pb-2 text-slate-400 hover:text-slate-200">⚡ Practice Test</button>
+      </div>
+
+      <!-- Tab Contents -->
+      <div id="content-container" class="space-y-4">
+        <!-- Dynamic JS content injected here -->
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // Database of Modules
+    const courseData = {
+      '1A': {
+        title: "1A: Lines in the Cartesian Plane",
+        lesson: `
+          <h3 class="text-lg font-semibold text-indigo-300 mb-2">Core Theory & Shortcuts</h3>
+          <ul class="list-disc pl-5 space-y-2 text-slate-300 text-sm">
+            <li><b>Gradient Formula:</b> $m = \\frac{y_2 - y_1}{x_2 - x_1}$</li>
+            <li><b>Perpendicular Condition:</b> $m_1 \\cdot m_2 = -1 \\implies m_2 = -\\frac{1}{m_1}$</li>
+            <li><b>Perpendicular Distance Shortcut:</b> Distance from $(x_0, y_0)$ to line $ax + by + c = 0$ is $d = \\frac{|a x_0 + b y_0 + c|}{\\sqrt{a^2 + b^2}}$.</li>
+          </ul>
+        `,
+        assignment: {
+          q: "Find the perpendicular distance from point $P(3, 5)$ to the line $3x - 4y + 1 = 0$.",
+          options: ["2", "1", "3", "0.5"],
+          correct: 0,
+          explanation: "Use $d = \\frac{\vert{}3(3) - 4(5) + 1\vert{}}{\\sqrt{3^2 + (-4)^2}} = \\frac{\vert{}9 - 20 + 1\vert{}}{\\sqrt{25}} = \\frac{\vert{}-10\vert{}}{5} = 2$."
+        },
+        project: `
+          <h3 class="text-lg font-bold text-amber-400">Project: Highway Alignment Design</h3>
+          <p class="text-sm text-slate-300">You are a civil engineer routing a straight highway between two towns at $(1, 2)$ and $(5, 8)$. An industrial facility at $(2, 7)$ emits noise up to $2\\text{ km}$.</p>
+          <p class="text-sm text-slate-300 mt-2"><b>Task:</b> Write a script or equation to calculate if the highway passes within the $2\\text{ km}$ noise radius of the facility.</p>
+        `,
+        test: {
+          q: "If line $L_1$ has gradient $m = -\\frac{2}{3}$ and $L_2 \\perp L_1$, what is the gradient of $L_2$?",
+          options: ["3/2", "-3/2", "2/3", "-2/3"],
+          correct: 0
+        }
+      },
+      '1B': {
+        title: "1B: Graphing Straight Lines",
+        lesson: `
+          <h3 class="text-lg font-semibold text-indigo-300 mb-2">Graphing Methods</h3>
+          <ul class="list-disc pl-5 space-y-2 text-slate-300 text-sm">
+            <li><b>$x$-intercept:</b> Set $y = 0$ and solve for $x$.</li>
+            <li><b>$y$-intercept:</b> Set $x = 0$ and solve for $y$.</li>
+            <li><b>General Form:</b> $ax + by + c = 0$. Gradient is $m = -\\frac{a}{b}$.</li>
+          </ul>
+        `,
+        assignment: {
+          q: "Find the $x$-intercept of the line $2x - 5y + 10 = 0$.",
+          options: ["-5", "5", "-2", "2"],
+          correct: 0,
+          explanation: "Set $y = 0 \\implies 2x + 10 = 0 \\implies 2x = -10 \\implies x = -5$."
+        },
+        project: `
+          <h3 class="text-lg font-bold text-amber-400">Project: Break-Even Cost Analysis</h3>
+          <p class="text-sm text-slate-300">Plot fixed costs ($y$-intercept) and production variable costs (gradient) for two competing manufacturing lines to determine the intersection volume.</p>
+        `,
+        test: {
+          q: "What is the gradient of the line $4x + 2y - 7 = 0$?",
+          options: ["-2", "2", "-4", "1/2"],
+          correct: 0
+        }
+      },
+      '1C': {
+        title: "1C: Perpendicular Bisectors & Voronoi Diagrams",
+        lesson: `
+          <h3 class="text-lg font-semibold text-indigo-300 mb-2">Voronoi Concepts</h3>
+          <ul class="list-disc pl-5 space-y-2 text-slate-300 text-sm">
+            <li><b>Perpendicular Bisector:</b> Line perpendicular to segment $AB$ passing through its midpoint $M\\left(\\frac{x_1+x_2}{2}, \\frac{y_1+y_2}{2}\\right)$.</li>
+            <li><b>Voronoi Vertices:</b> Intersections of perpendicular bisectors, equidistant from three adjacent sites.</li>
+          </ul>
+        `,
+        assignment: {
+          q: "What is the midpoint of points $A(-2, 6)$ and $B(4, 2)$?",
+          options: ["(1, 4)", "(2, 8)", "(3, 2)", "(-1, 4)"],
+          correct: 0,
+          explanation: "Midpoint $M = \\left(\\frac{-2 + 4}{2}, \\frac{6 + 2}{2}\\right) = (1, 4)$."
+        },
+        project: `
+          <h3 class="text-lg font-bold text-amber-400">Project: Emergency Hospital Dispatch Zones</h3>
+          <p class="text-sm text-slate-300">Given coordinates for three hospital sites in a city, plot their Voronoi boundaries to establish which emergency call location routes to which hospital.</p>
+        `,
+        test: {
+          q: "Voronoi edges are formed by which geometric construction?",
+          options: ["Perpendicular Bisectors", "Angle Bisectors", "Medians", "Altitudes"],
+          correct: 0
+        }
+      },
+      '1D': {
+        title: "1D: Simultaneous Linear Equations",
+        lesson: `
+          <h3 class="text-lg font-semibold text-indigo-300 mb-2">3x3 Systems & Geometries</h3>
+          <ul class="list-disc pl-5 space-y-2 text-slate-300 text-sm">
+            <li><b>Unique Solution:</b> Planes intersect at a single point.</li>
+            <li><b>Infinitely Many Solutions:</b> Planes intersect along a line or coincide.</li>
+            <li><b>No Solution:</b> Parallel planes or triangular prism formation.</li>
+          </ul>
+        `,
+        assignment: {
+          q: "Solve $x + y = 5$ and $x - y = 1$ for $x$.",
+          options: ["3", "2", "4", "1"],
+          correct: 0,
+          explanation: "Add equations: $2x = 6 \\implies x = 3$."
+        },
+        project: `
+          <h3 class="text-lg font-bold text-amber-400">Project: Chemical Equilibrium Mixture</h3>
+          <p class="text-sm text-slate-300">Formulate a $3 \\times 3$ linear matrix system to balance chemical compounds in a laboratory solution containing three distinct reactant solutions.</p>
+        `,
+        test: {
+          q: "If a system of 3 linear equations has no solution, how might the planes be arranged?",
+          options: ["Forming a triangular prism", "Intersecting at one point", "Coinciding entirely", "Parallel without separation"],
+          correct: 0
+        }
+      }
+    };
+
+    let currentTopic = '1A';
+    let currentTab = 'lesson';
+    let score = 0;
+
+    function loadTopic(topicKey) {
+      currentTopic = topicKey;
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white');
+        btn.classList.add('bg-slate-700', 'text-slate-200');
+      });
+      document.getElementById(`btn-${topicKey}`).classList.add('bg-indigo-600', 'text-white');
+      document.getElementById('module-title').innerText = courseData[topicKey].title;
+      document.getElementById('module-badge').innerText = `Section ${topicKey}`;
+      renderTab();
+    }
+
+    function switchTab(tabKey) {
+      currentTab = tabKey;
+      document.querySelectorAll('[id^="tab-"]').forEach(btn => {
+        btn.classList.remove('border-b-2', 'border-indigo-500', 'text-indigo-400');
+        btn.classList.add('text-slate-400');
+      });
+      document.getElementById(`tab-${tabKey}`).classList.add('border-b-2', 'border-indigo-500', 'text-indigo-400');
+      renderTab();
+    }
+
+    function renderTab() {
+      const container = document.getElementById('content-container');
+      const data = courseData[currentTopic];
+
+      if (currentTab === 'lesson') {
+        container.innerHTML = `<div class="bg-slate-800 p-4 rounded-lg border border-slate-700">${data.lesson}</div>`;
+      } else if (currentTab === 'assignment' || currentTab === 'test') {
+        const item = currentTab === 'assignment' ? data.assignment : data.test;
+        container.innerHTML = `
+          <div class="bg-slate-800 p-5 rounded-lg border border-slate-700 space-y-4">
+            <h3 class="font-semibold text-lg text-slate-100">${item.q}</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              ${item.options.map((opt, idx) => `
+                <button onclick="checkAnswer(${idx}, ${item.correct}, '${currentTab}')" class="option-btn bg-slate-700 hover:bg-slate-600 text-left p-3 rounded border border-slate-600 transition">
+                  ${opt}
+                </button>
+              `).join('')}
+            </div>
+            <div id="feedback" class="mt-4 text-sm font-medium"></div>
+          </div>
+        `;
+      } else if (currentTab === 'project') {
+        container.innerHTML = `<div class="bg-slate-800 p-5 rounded-lg border border-slate-700">${data.project}</div>`;
+      }
+    }
+
+    function checkAnswer(selected, correct, mode) {
+      const feedback = document.getElementById('feedback');
+      if (selected === correct) {
+        feedback.className = "mt-4 text-sm font-medium text-emerald-400";
+        feedback.innerText = "Correct! +10 points";
+        score += 10;
+        document.getElementById('user-score').innerText = score;
+      } else {
+        feedback.className = "mt-4 text-sm font-medium text-rose-400";
+        feedback.innerText = "Incorrect. Try reviewing the lesson tab!";
+      }
+      if (courseData[currentTopic][mode].explanation) {
+        feedback.innerText += " " + courseData[currentTopic][mode].explanation;
+      }
+    }
+
+    // Initialize App
+    loadTopic('1A');
+  </script>
+</body>
+</html>
