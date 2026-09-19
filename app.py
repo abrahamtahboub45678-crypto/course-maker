@@ -1,7 +1,8 @@
 import streamlit as st
 import datetime
 import json
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 st.set_page_config(page_title="Universal Course Generator", layout="wide", page_icon="🎓")
 
@@ -60,16 +61,16 @@ if st.button("🚀 Generate Complete Course", type="primary"):
     else:
         with st.spinner("Building custom curriculum, open-response prompts, and comprehensive assessments..."):
             try:
-                # Configure the Gemini client
-                genai.configure(api_key=api_key)
+                client = genai.Client(api_key=api_key)
                 
-                # Initialize model
-                model = genai.GenerativeModel(
-                    model_name="gemini-1.5-flash",
-                    generation_config={"response_mime_type": "application/json"}
+                # Updated to active model endpoint: gemini-3.6-flash
+                response = client.models.generate_content(
+                    model='gemini-3.6-flash',
+                    contents=build_course_prompt(course_name, num_modules, days_remaining),
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json"
+                    )
                 )
-                
-                response = model.generate_content(build_course_prompt(course_name, num_modules, days_remaining))
                 
                 course_data = json.loads(response.text)
                 st.session_state['course_data'] = course_data
